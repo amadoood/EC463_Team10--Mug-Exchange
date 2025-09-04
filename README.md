@@ -1,11 +1,10 @@
-# 02-Team Repo
-Template for team repo
+# Mug Exchange
 
 <p align="center">
 <img src="./images/thisismyteam.png" width="50%">
 </p>
 <p align="center">
-This is my team
+Making coffee sustainable one mug at a time
 </p>
 
 ## Team links

@@ -7,7 +7,7 @@
 Making coffee sustainable one mug at a time
 </p>
 
-## Project Blurb
+## Project Description
 Mug Exchange sets out to encourage sustainability in coffee shops by establishing a reusable mug system. This system features a unique label for each mug with a database for storage of consumer accounts, API integration with food ordering services, and a locator for participating shops. The objectives for this project are to create an inexpensive, waterproof mug identifier, develop a database structure to store mug IDs alongside fetching queries, and to implement advanced features such as location services and interfacing with larger food servicing applications.
 
 ## Team links

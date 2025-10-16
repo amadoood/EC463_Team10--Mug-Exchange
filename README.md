@@ -17,6 +17,8 @@ Mug Exchange sets out to encourage sustainability in coffee shops by establishin
 - [ECE Senior Design Piazza Site](https://piazza.com/bu/fall2025/ec463/home)
 - [Blackboard](http://learn.bu.edu/)
 
+## Team Mug's MiniProject 
+- [Miniproject](https://github.com/amadoood/Team-Mug-Miniproject)
 
 ## Optional features links
 - Team Jira

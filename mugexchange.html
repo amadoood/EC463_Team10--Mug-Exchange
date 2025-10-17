@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Mug Exchange (SPA)</title>
+<style>
+:root{
+  --bg:#f5f7fb; --text:#0f172a; --muted:#64748b;
+  --border:#e2e8f0; --card:#fff;
+  --green:#16a34a; --green-dark:#166534; --green-b:#15803d;
+  --red:#ef4444; --red-dark:#991b1b; --red-bg:#fee2e2;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;font-family:-apple-system,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--text);background:var(--bg)}
+button{font:inherit;cursor:pointer}
+a{text-decoration:none;color:inherit}
+:focus-visible{outline:2px solid #16a34a66; outline-offset:2px}
+.app{max-width:420px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column}
+.content{padding:16px 16px 92px}
+.hidden{display:none!important}
+#view-login .logo img {
+  width: 350px;
+  height: auto;
+  margin-bottom: 50px;
+  transform: translateX(17px);
+  pointer-events: none;
+}
+#view-dashboard .card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  width: 340px;
+  min-height: 460px;
+  padding: 32px 28px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+#view-dashboard .h1 {
+  margin-bottom: 10px;
+}
+#view-dashboard .logo {
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+#view-dashboard .logo img {
+  width: 350px;
+  height: auto;
+  transform: translateX(17px);
+  pointer-events: none;
+}
+#view-dashboard .btn-grid {
+  margin-top: 12px;
+  gap: 16px;
+  width: 100%;
+  max-width: 260px;
+}
+#view-dashboard .btn {
+  width: 100%;
+  text-align: center;
+}
+.center-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:8px;width:min(420px,100%);background:#fff;border:1px solid var(--border);border-radius:16px;padding:8px 10px;display:flex;justify-content:space-around;gap:6px;box-shadow:0 6px 22px rgba(0,0,0,.08)}
+.nav a{padding:8px 12px;border-radius:10px}
+.nav a.active{background:#16a34a1a;color:var(--green-dark);border:1px solid var(--green)}
+.h1{font-weight:800;font-size:1.25rem;margin:8px 0}
+.h2{font-weight:700;font-size:1.05rem;margin:0 0 4px}
+.meta{color:var(--muted);font-size:.9rem}
+.input{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;font-size:16px;background:#fff}
+.btn{padding:12px 14px;border-radius:12px;border:1px solid var(--green-b);background:var(--green);color:#fff;font-weight:600;display:inline-block;text-align:center}
+.row{display:flex;align-items:center;gap:12px}
+.center{text-align:center}
+.stack{display:grid;gap:12px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.logo{
+  width:44px;height:44px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  background:transparent !important; border:none; box-shadow:none;
+}
+.logo img{display:block; width:200px; height:auto}
+.pill{white-space:nowrap;font-size:.85rem;padding:6px 10px;border-radius:999px;border:1px solid var(--green);color:var(--green-dark);background:#16a34a1a}
+.field{display:grid;gap:8px}
+.list{display:grid;gap:10px}
+.item{display:flex;align-items:center;gap:12px}
+.item-body{flex:1;min-width:0}
+.map{
+  height:260px;border-radius:12px;border:1px solid var(--border);
+  background:
+    linear-gradient(0deg,var(--border) 1px,transparent 1px) 0 0/36px 36px,
+    linear-gradient(90deg,var(--border) 1px,transparent 1px) 0 0/36px 36px,
+    #c8e3ff;
+  position:relative; overflow:hidden;
+}
+.pin{position:absolute;width:18px;height:18px;border-radius:50%;background:var(--red);border:2px solid #fff;box-shadow:0 1px 2px rgba(0,0,0,.25);cursor:pointer}
+.pin.green{background:var(--green)}
+.login-hero{display:grid;justify-items:center;margin-top:18px}
+.login-hero .logo{width:120px;height:120px}
+.login-hero .logo img{width:200px;height:auto}
+.btn-grid{margin:0 auto; max-width:320px; display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+.btn-grid .full{grid-column:1 / -1}
+.overdue-pill{border-color:var(--red); color:var(--red-dark); background:var(--red-bg)}
+.overdue-text{color:var(--red-dark); font-weight:600; font-size:.9rem}
+</style>
+</head>
+<body>
+<div class="app">
+  <main id="view-login" class="content center-screen">
+    <div class="login-hero" aria-hidden="true">
+      <div class="logo">
+        <img src="mug.png" alt="Mug Exchange Logo">
+      </div>
+      <h1 class="h1">Mug Exchange</h1>
+      <div class="field" style="width:100%;max-width:320px">
+        <input id="login-username" class="input" placeholder="Email or Username" autocomplete="off">
+        <button id="login-btn" class="btn">Log In</button>
+        <p id="login-err" class="meta" style="color:#dc2626;display:none">Invalid login. Try <b>demo</b>.</p>
+      </div>
+    </div>
+  </main>
+  <main id="view-dashboard" class="content center-screen hidden">
+    <div class="card center">
+      <h2 class="h1" id="welcome">Welcome Back!</h2>
+      <div class="row" style="justify-content:center;margin:6px 0 12px">
+        <div class="logo" style="width:96px;height:96px">
+          <img src="mug.png" alt="Mug Exchange Logo">
+        </div>
+      </div>
+      <div class="btn-grid">
+        <a class="btn" data-nav="order">Order</a>
+        <a class="btn" data-nav="past">Past Orders</a>
+        <a class="btn full" data-nav="map" id="dash-map-btn">Map</a>
+      </div>
+    </div>
+  </main>
+  <main id="view-order" class="content hidden">
+    <h1 class="h1">Order from a Partnered Café</h1>
+    <input id="order-q" class="input" placeholder="Search by name or location…">
+    <div class="meta" id="order-count" style="margin:10px 0 6px">Loading…</div>
+    <div id="order-list" class="list"></div>
+  </main>
+  <main id="view-map" class="content hidden">
+    <h1 class="h1">Find a Partnered Cafe</h1>
+    <input id="map-q" class="input" placeholder="Search…" style="margin:6px 0 12px 0">
+    <div class="map" id="map">
+      <div class="pin green" style="left:40px; top:140px" data-id="gsu-starbucks" title="Starbucks @ GSU"></div>
+      <div class="pin green" style="left:160px; top:70px" data-id="pavement" title="Pavement Coffeehouse"></div>
+      <div class="pin" style="left:260px; top:160px" data-id="bluebottle" title="Blue Bottle — Kenmore"></div>
+      <div class="pin green" style="left:100px; top:30px" data-id="cfa" title="CFA Café"></div>
+    </div>
+    <div id="map-list" class="stack" style="margin-top:12px"></div>
+  </main>
+  <main id="view-past" class="content hidden">
+    <h1 class="h1">Past Orders</h1>
+    <div id="past-list" class="stack"></div>
+  </main>
+  <nav class="nav" id="nav">
+    <a data-nav="login">Login</a>
+    <a data-nav="dashboard">Home</a>
+    <a data-nav="order">Order</a>
+    <a data-nav="map">Map</a>
+    <a data-nav="past">History</a>
+  </nav>
+</div>
+<script>
+const cafes = [
+  { id:'gsu-starbucks', name:'Starbucks @ GSU', area:'Boston University', dist:'0.1 mi', mugs:14, url:'https://www.starbucks.com' },
+  { id:'pavement', name:'Pavement Coffeehouse', area:'Commonwealth Ave', dist:'0.3 mi', mugs:8, url:'https://pavementcoffeehouse.com' },
+  { id:'bluebottle', name:'Blue Bottle — Kenmore', area:'Kenmore', dist:'0.7 mi', mugs:0, url:'https://bluebottlecoffee.com' },
+  { id:'cfa', name:'CFA Café', area:'College of Fine Arts', dist:'0.4 mi', mugs:5, url:'https://www.bu.edu/cfa' }
+];
+const orders = [
+  {id:101, cafe:cafes[0].name, item:'Latte', ordered:'2025-10-02T09:41:00', returned:'2025-10-02T15:05:00'},
+  {id:102, cafe:cafes[1].name, item:'Black Coffee', ordered:'2025-10-01T08:25:00', returned:'2025-10-01T12:18:00'},
+  {id:103, cafe:cafes[2].name, item:'Cold Brew', ordered:'2025-09-30T10:04:00', returned:null}
+];
+const $ = s => document.querySelector(s);
+const listEl = sel => document.getElementById(sel);
+function fmtDate(s){
+  const d = new Date(s);
+  return d.toLocaleString([], {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'});
+}
+function daysOverdue(orderedISO, days=3){
+  const due = new Date(orderedISO); due.setDate(due.getDate()+days);
+  const now = new Date();
+  if (now <= due) return null;
+  return Math.ceil((now - due) / (1000*60*60*24));
+}
+function cafeRow(c){
+  return `
+    <div class="card item">
+      <div class="logo"></div>
+      <div class="item-body">
+        <div class="h2">${c.name}</div>
+        <div class="meta">${c.area} • ${c.dist} • ${c.mugs} mugs</div>
+      </div>
+      <a class="btn" href="${c.url}" target="_blank" rel="noopener">Order</a>
+    </div>`;
+}
+function renderOrderList(q=''){
+  const needle = q.trim().toLowerCase();
+  const filtered = cafes.filter(c => (c.name + ' ' + c.area).toLowerCase().includes(needle));
+  listEl('order-list').innerHTML = filtered.map(cafeRow).join('') || `<div class="meta">No results.</div>`;
+  $('#order-count').textContent = `${filtered.length} café${filtered.length!==1?'s':''}`;
+}
+function renderMapList(q=''){
+  const needle = q.trim().toLowerCase();
+  const filtered = cafes.filter(c => (c.name + ' ' + c.area).toLowerCase().includes(needle));
+  listEl('map-list').innerHTML = filtered.map(cafeRow).join('') || `<div class="meta">No results.</div>`;
+}
+function historyRow(o){
+  const overdueDays = !o.returned ? daysOverdue(o.ordered,3) : null;
+  const status = overdueDays
+      ? `<span class="pill overdue-pill">Overdue</span>`
+      : `<span class="pill">Returned</span>`;
+  const extra = overdueDays
+      ? ` • <span class="overdue-text">${overdueDays} day${overdueDays>1?'s':''} overdue</span>`
+      : ` • Returned: ${fmtDate(o.returned)}`;
+  return `
+    <div class="card item">
+      <div class="logo"></div>
+      <div class="item-body">
+        <div class="h2">${o.item} — ${o.cafe}</div>
+        <div class="meta">Ordered: ${fmtDate(o.ordered)}${extra}</div>
+      </div>
+      ${status}
+    </div>`;
+}
+function renderPast(){
+  listEl('past-list').innerHTML = orders.map(historyRow).join('');
+}
+const state = { user:null };
+const views = ['login','dashboard','order','map','past'];
+function setActiveTab(view){
+  document.querySelectorAll('.nav a').forEach(a=>{
+    a.classList.toggle('active', a.dataset.nav===view);
+  });
+}
+function show(view){
+  if(view!=='login' && !state.user){ view='login'; }
+  views.forEach(v=>document.getElementById('view-'+v).classList.toggle('hidden', v!==view));
+  document.getElementById('nav').style.display = (view==='login') ? 'none' : 'flex';
+  if(view==='order'){ renderOrderList($('#order-q').value||''); }
+  if(view==='map'){ renderMapList($('#map-q').value||''); }
+  if(view==='past'){ renderPast(); }
+  setActiveTab(view);
+  window.scrollTo(0,0);
+}
+document.getElementById('login-btn').addEventListener('click',()=>{
+  const val = (document.getElementById('login-username').value||'').trim().toLowerCase();
+  const err = document.getElementById('login-err');
+  if(val==='demo'){
+    state.user='Demo';
+    err.style.display='none';
+    document.getElementById('welcome').textContent=`Welcome Back, ${state.user}!`;
+    show('dashboard');
+  }else{
+    err.style.display='block';
+  }
+});
+document.querySelectorAll('[data-nav]').forEach(el=>{
+  el.addEventListener('click',()=>show(el.dataset.nav));
+});
+document.getElementById('order-q').addEventListener('input', e=>renderOrderList(e.target.value));
+document.getElementById('map-q').addEventListener('input', e=>renderMapList(e.target.value));
+document.querySelectorAll('.pin').forEach(pin=>{
+  pin.addEventListener('click', ()=>{
+    const id = pin.dataset.id;
+    const c = cafes.find(x=>x.id===id);
+    if(!c) return;
+    document.getElementById('map-q').value = c.name;
+    renderMapList(c.name);
+  });
+});
+show('login');
+</script>
+</body>
+</html>

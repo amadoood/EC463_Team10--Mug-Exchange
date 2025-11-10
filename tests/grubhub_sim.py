@@ -6,6 +6,7 @@ WEBHOOK_URL = "http://localhost:3000/api/grubhub/webhook"
 
 # Mock data to simulate "orders" from Grubhub
 MOCK_ORDERS = []
+merchant_list = ["Starbucks", "Pavement", "Saxby's"]
 
 def generate_mock_orders():
     order_counter = 1001
@@ -17,7 +18,7 @@ def generate_mock_orders():
 
         new_order = {
             "orderId": str(order_counter),
-            "merchantID": "1",
+            "merchantName": "Starbucks",
             "status": "IN_PROGRESS",
             "orderDate": time_counter,
             "items": [
@@ -31,7 +32,7 @@ def generate_mock_orders():
         print(f"[+] Added mock order: {new_order}")
         order_counter += 1
         
-        new_time = datetime.strptime(time_counter, "%Y-%m-%dT%H:%M:%SZ") + timedelta(seconds = 5)
+        new_time = datetime.strptime(time_counter, "%Y-%m-%dT%H:%M:%SZ") + timedelta(seconds = 3)
         time_counter = new_time.strftime("%Y-%m-%dT%H:%M:%SZ")
 
         try:

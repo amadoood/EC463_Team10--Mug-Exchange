@@ -5,7 +5,7 @@ import { Server } from "socket.io";
 const app = express();
 const PORT = 3000;
 
-MOCK_ORDERS = []
+let MOCK_ORDERS = [];
 
 app.use(express.json());
 
@@ -24,10 +24,6 @@ io.on('connection', (socket) => {
     });
 });
 
-app.get('/', (req, res) => {
-    res.send("Mug Exchange server!");
-});
-
 app.post('/api/grubhub/webhook', (req, res) => {
     console.log("Webhook received", req.body);
 
@@ -38,6 +34,9 @@ app.post('/api/grubhub/webhook', (req, res) => {
     res.status(200).json({message: "Webhook received"})
 });
 
+app.get('/', (req, res) => {
+    res.send("Mug Exchange server!");
+});
 
 server.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);

@@ -5,94 +5,219 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Mug Exchange</title>
 <style>
-:root{
+:root {
   --bg:#f5f7fb; --text:#0f172a; --muted:#64748b;
   --border:#e2e8f0; --card:#fff;
   --green:#16a34a; --green-dark:#166534; --green-b:#15803d;
   --red:#ef4444; --red-dark:#991b1b; --red-bg:#fee2e2;
 }
-*{box-sizing:border-box}
-html,body{margin:0;padding:0;font-family:-apple-system,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--text);background:var(--bg)}
-button{font:inherit;cursor:pointer}
-a{text-decoration:none;color:inherit}
-:focus-visible{outline:2px solid #16a34a66; outline-offset:2px}
-
-.app{max-width:420px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column}
-.content{padding:16px 16px 92px}
-.hidden{display:none!important}
-
-/* Login hero image */
-#view-login .logo img{width:350px;height:auto;margin-bottom:50px;transform:translateX(17px);pointer-events:none}
-
-/* Dashboard card */
-#view-dashboard .card{
-  background:var(--card);border:1px solid var(--border);border-radius:16px;
-  box-shadow:0 2px 8px rgba(0,0,0,.06);width:340px;min-height:460px;
-  padding:32px 28px 40px;display:flex;flex-direction:column;align-items:center;gap:16px
+* { box-sizing:border-box }
+html,body {
+  margin:0; padding:0;
+  font-family:-apple-system,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+  color:var(--text); background:var(--bg);
 }
-#view-dashboard .h1{margin:0}
-#view-dashboard .logo{margin:8px 0 10px}
-#view-dashboard .logo img{width:350px;height:auto;transform:translateX(17px);pointer-events:none}
-#view-dashboard .btn-grid{margin-top:4px;gap:16px;width:100%;max-width:260px}
-#view-dashboard .btn{width:100%;text-align:center}
+button { font:inherit; cursor:pointer }
+a { text-decoration:none; color:inherit }
+:focus-visible { outline:2px solid #16a34a66; outline-offset:2px }
+
+.app {
+  max-width:420px;
+  margin:0 auto;
+  min-height:100dvh;
+  display:flex;
+  flex-direction:column;
+}
+.content { padding:16px 16px 92px }
+.hidden { display:none!important }
 
 /* Centering utility */
-.center-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.center-screen {
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
 
 /* Bottom nav */
-.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:8px;width:min(420px,100%);
-  background:#fff;border:1px solid var(--border);border-radius:16px;padding:8px 10px;display:flex;justify-content:space-around;gap:6px;box-shadow:0 6px 22px rgba(0,0,0,.08)}
-.nav a{padding:8px 12px;border-radius:10px}
-.nav a.active{background:#16a34a1a;color:var(--green-dark);border:1px solid var(--green)}
+.nav {
+  position:fixed;
+  left:50%;
+  transform:translateX(-50%);
+  bottom:8px;
+  width:min(420px,100%);
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:8px 10px;
+  display:flex;
+  justify-content:space-around;
+  gap:6px;
+  box-shadow:0 6px 22px rgba(0,0,0,.08);
+}
+.nav a {
+  padding:8px 12px;
+  border-radius:10px;
+}
+.nav a.active {
+  background:#16a34a1a;
+  color:var(--green-dark);
+  border:1px solid var(--green);
+}
 
 /* UI atoms */
-.h1{font-weight:800;font-size:1.25rem;margin:8px 0}
-.h2{font-weight:700;font-size:1.05rem;margin:0 0 4px}
-.meta{color:var(--muted);font-size:.9rem}
-.input{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;font-size:16px;background:#fff}
-.btn{padding:12px 14px;border-radius:12px;border:1px solid var(--green-b);background:var(--green);color:#fff;font-weight:600;display:inline-block;text-align:center}
-.row{display:flex;align-items:center;gap:12px}
-.stack{display:grid;gap:12px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.h1 { font-weight:800; font-size:1.25rem; margin:8px 0 }
+.h2 { font-weight:700; font-size:1.05rem; margin:0 0 4px }
+.meta { color:var(--muted); font-size:.9rem }
+.input {
+  width:100%;
+  padding:12px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  font-size:16px;
+  background:#fff;
+}
+.btn {
+  padding:12px 14px;
+  border-radius:12px;
+  border:1px solid var(--green-b);
+  background:var(--green);
+  color:#fff;
+  font-weight:600;
+  display:inline-block;
+  text-align:center;
+}
+.row { display:flex; align-items:center; gap:12px }
+.stack { display:grid; gap:12px }
+.card {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:12px;
+  box-shadow:0 1px 2px rgba(0,0,0,.03);
+}
 
 /* List rows */
-.list{display:grid;gap:12px}
-.item{display:flex;align-items:center;gap:12px}
-.item-body{flex:1;min-width:0}
-.thumb{width:44px;height:44px;border-radius:8px;flex:0 0 44px;object-fit:contain}
+.list { display:grid; gap:12px }
+.item { display:flex; align-items:center; gap:12px }
+.item-body { flex:1; min-width:0 }
+.thumb {
+  width:44px;
+  height:44px;
+  border-radius:8px;
+  flex:0 0 44px;
+  object-fit:contain;
+}
 
 /* Pills */
-.pill{white-space:nowrap;font-size:.85rem;padding:6px 10px;border-radius:999px;border:1px solid var(--green);color:var(--green-dark);background:#16a34a1a}
-.overdue-pill{border-color:var(--red);color:var(--red-dark);background:var(--red-bg)}
-.overdue-text{color:var(--red-dark);font-weight:600;font-size:.9rem}
+.pill {
+  white-space:nowrap;
+  font-size:.85rem;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid var(--green);
+  color:var(--green-dark);
+  background:#16a34a1a;
+}
+.overdue-pill {
+  border-color:var(--red);
+  color:var(--red-dark);
+  background:var(--red-bg);
+}
+.overdue-text {
+  color:var(--red-dark);
+  font-weight:600;
+  font-size:.9rem;
+}
 
 /* Map mock */
-.map{
-  height:260px;border-radius:12px;border:1px solid var(--border);
+.map {
+  height:260px;
+  border-radius:12px;
+  border:1px solid var(--border);
   background:
     linear-gradient(0deg,var(--border) 1px,transparent 1px) 0 0/36px 36px,
     linear-gradient(90deg,var(--border) 1px,transparent 1px) 0 0/36px 36px,
     #c8e3ff;
-  position:relative;overflow:hidden
+  position:relative;
+  overflow:hidden;
 }
-.pin{position:absolute;width:18px;height:18px;border-radius:50%;background:var(--red);border:2px solid #fff;box-shadow:0 1px 2px rgba(0,0,0,.25);cursor:pointer}
-.pin.green{background:var(--green)}
+.pin {
+  position:absolute;
+  width:18px; height:18px;
+  border-radius:50%;
+  background:var(--red);
+  border:2px solid #fff;
+  box-shadow:0 1px 2px rgba(0,0,0,.25);
+  cursor:pointer;
+}
+.pin.green { background:var(--green) }
 
-/* Login layout */
-.login-hero{display:grid;justify-items:center;margin-top:18px}
-.login-hero .logo{width:120px;height:120px}
-.login-hero .logo img{width:200px;height:auto}
+/* Login layout & hero image */
+.login-hero {
+  display:grid;
+  justify-items:center;
+  gap:16px;
+}
+#view-login .logo img {
+  width:360px;      /* large but centered */
+  height:auto;
+  margin:0 auto 16px;
+  display:block;
+  pointer-events:none;
+}
+
+/* Dashboard card & hero image */
+#view-dashboard .card {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  box-shadow:0 2px 8px rgba(0,0,0,.06);
+  width:340px;
+  min-height:460px;
+  padding:24px 20px 32px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:16px;
+}
+#view-dashboard .h1 { margin:0 }
+#view-dashboard .logo img {
+  width:360px;
+  height:auto;
+  margin:0 auto;
+  display:block;
+  pointer-events:none;
+}
 
 /* Dashboard 2-up + 1 layout */
-.btn-grid{margin:0 auto;max-width:320px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.btn-grid .full{grid-column:1 / -1}
+.btn-grid {
+  margin:0 auto;
+  max-width:320px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.btn-grid .full { grid-column:1 / -1 }
 
 /* Status banner */
-.status-banner{width:100%;border:1px solid var(--border);background:#fff;border-radius:12px;padding:12px 14px;text-align:left}
-.status-banner .title{font-weight:700;margin-bottom:4px}
-.status-none{color:var(--muted)}
-.status-good{color:var(--green-dark)}
-.status-bad{color:var(--red-dark)}
+.status-banner {
+  width:100%;
+  border:1px solid var(--border);
+  background:#fff;
+  border-radius:12px;
+  padding:12px 14px;
+  text-align:left;
+}
+.status-banner .title {
+  font-weight:700;
+  margin-bottom:4px;
+}
+.status-none { color:var(--muted) }
+.status-good { color:var(--green-dark) }
+.status-bad  { color:var(--red-dark) }
 </style>
 </head>
 <body>
@@ -100,13 +225,17 @@ a{text-decoration:none;color:inherit}
 
   <!-- LOGIN -->
   <main id="view-login" class="content center-screen">
-    <div class="login-hero" aria-hidden="true">
-      <div class="logo"><img src="mug.png" alt="Mug Exchange Logo"></div>
+    <div class="login-hero">
+      <div class="logo">
+        <img src="mug.png" alt="Mug Exchange Logo">
+      </div>
       <h1 class="h1">Mug Exchange</h1>
       <div class="stack" style="width:100%;max-width:320px">
-        <input id="login-username" class="input" placeholder="Email or Username" autocomplete="off" value="">
+        <input id="login-username" class="input" placeholder="Email or Username" autocomplete="off">
         <button id="login-btn" class="btn">Log In</button>
-        <p id="login-err" class="meta" style="color:#dc2626;display:none">Invalid login. Try <b>demo</b>.</p>
+        <p id="login-err" class="meta" style="color:#dc2626;display:none">
+          Invalid login. Try <b>demo</b>.
+        </p>
       </div>
     </div>
   </main>
@@ -118,13 +247,13 @@ a{text-decoration:none;color:inherit}
 
       <div id="status" class="status-banner">
         <div class="title">Mug Status</div>
-        <div id="status-text" class="status-none">No active mug. Place an order to get started.</div>
+        <div id="status-text" class="status-none">
+          No active mug. Place an order to get started.
+        </div>
       </div>
 
-      <div class="row" style="justify-content:center">
-        <div class="logo" style="width:96px;height:96px">
-          <img src="mug.png" alt="Mug Exchange Logo">
-        </div>
+      <div class="logo">
+        <img src="mug.png" alt="Mug Exchange Logo">
       </div>
 
       <div class="btn-grid">
@@ -176,9 +305,9 @@ a{text-decoration:none;color:inherit}
 /* Demo data */
 const cafes = [
   { id:'gsu-starbucks', name:'Starbucks @ GSU', area:'Boston University', dist:'0.1 mi', mugs:14, url:'https://www.starbucks.com' },
-  { id:'pavement', name:'Pavement Coffeehouse', area:'Commonwealth Ave', dist:'0.3 mi', mugs:8, url:'https://pavementcoffeehouse.com' },
-  { id:'bluebottle', name:'Blue Bottle — Kenmore', area:'Kenmore', dist:'0.7 mi', mugs:0, url:'https://bluebottlecoffee.com' },
-  { id:'cfa', name:'CFA Café', area:'College of Fine Arts', dist:'0.4 mi', mugs:5, url:'https://www.bu.edu/cfa' }
+  { id:'pavement',      name:'Pavement Coffeehouse', area:'Commonwealth Ave', dist:'0.3 mi', mugs:8, url:'https://pavementcoffeehouse.com' },
+  { id:'bluebottle',    name:'Blue Bottle — Kenmore', area:'Kenmore', dist:'0.7 mi', mugs:0, url:'https://bluebottlecoffee.com' },
+  { id:'cfa',           name:'CFA Café', area:'College of Fine Arts', dist:'0.4 mi', mugs:5, url:'https://www.bu.edu/cfa' }
 ];
 
 let orders = [
@@ -187,11 +316,12 @@ let orders = [
   {id:103, cafe:cafes[2].name, item:'Cold Brew',    ordered:'2025-09-30T10:04:00', returned:null}
 ];
 
-/* State */
-const state = { user:null, activeMug:null };
+const state = {
+  user: null,
+  activeMug: null
+};
 
-/* Helpers */
-const $ = s => document.querySelector(s);
+const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const byId = id => document.getElementById(id);
 
@@ -200,13 +330,13 @@ function fmtDate(s){
   return d.toLocaleString([], {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'});
 }
 function daysOverdue(orderedISO, days=3){
-  const due = new Date(orderedISO); due.setDate(due.getDate()+days);
+  const due = new Date(orderedISO);
+  due.setDate(due.getDate()+days);
   const now = new Date();
-  if (now <= due) return null;
-  return Math.ceil((now - due) / (1000*60*60*24));
+  if(now <= due) return null;
+  return Math.ceil((now - due)/(1000*60*60*24));
 }
 
-/* Renderers */
 function cafeRow(c){
   return `
     <div class="card item">
@@ -221,17 +351,20 @@ function cafeRow(c){
 function renderOrderList(q=''){
   const needle = q.trim().toLowerCase();
   const filtered = cafes.filter(c => (c.name + ' ' + c.area).toLowerCase().includes(needle));
-  byId('order-list').innerHTML = filtered.map(cafeRow).join('') || `<div class="meta">No results.</div>`;
-  byId('order-count').textContent = `${filtered.length} café${filtered.length!==1?'s':''}`;
+  byId('order-list').innerHTML =
+    filtered.map(cafeRow).join('') || `<div class="meta">No results.</div>`;
+  byId('order-count').textContent =
+    `${filtered.length} café${filtered.length!==1?'s':''}`;
 }
+
 function historyRow(o){
   const overdueDays = !o.returned ? daysOverdue(o.ordered,3) : null;
   const status = overdueDays
-      ? `<span class="pill overdue-pill">Overdue</span>`
-      : `<span class="pill">Returned</span>`;
+    ? `<span class="pill overdue-pill">Overdue</span>`
+    : `<span class="pill">Returned</span>`;
   const extra = overdueDays
-      ? ` • <span class="overdue-text">${overdueDays} day${overdueDays>1?'s':''} overdue</span>`
-      : ` • Returned: ${fmtDate(o.returned)}`;
+    ? ` • <span class="overdue-text">${overdueDays} day${overdueDays>1?'s':''} overdue</span>`
+    : ` • Returned: ${fmtDate(o.returned)}`;
   return `
     <div class="card item">
       <img class="thumb" src="mug.png" alt="">
@@ -242,7 +375,10 @@ function historyRow(o){
       ${status}
     </div>`;
 }
-function renderPast(){ byId('past-list').innerHTML = orders.map(historyRow).join(''); }
+function renderPast(){
+  byId('past-list').innerHTML = orders.map(historyRow).join('');
+}
+
 function renderStatus(){
   const el = byId('status-text');
   const s = state.activeMug;
@@ -251,12 +387,15 @@ function renderStatus(){
     el.textContent = 'No active mug. Place an order to get started.';
     return;
   }
-  const dueStr = new Date(s.dueISO).toLocaleString([], {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'});
+  const dueStr = new Date(s.dueISO).toLocaleString([], {
+    month:'short', day:'numeric', hour:'numeric', minute:'2-digit'
+  });
   el.className = 'status-good';
-  el.innerHTML = `Checked out <b>${s.item}</b> at <b>${s.cafe}</b> • Mug ID <b>${s.id}</b><br>Due by <b>${dueStr}</b>`;
+  el.innerHTML =
+    `Checked out <b>${s.item}</b> at <b>${s.cafe}</b> • Mug ID <b>${s.id}</b><br>Due by <b>${dueStr}</b>`;
 }
 
-/* Public hooks for backend events */
+/* Hooks used by tests / future backend */
 function onMugAssigned({ id, cafe, item, orderedISO, dueISO }){
   state.activeMug = { id, cafe, item, orderedISO, dueISO };
   renderStatus();
@@ -265,7 +404,8 @@ function recordReturn({ cafe, item, orderedISO }){
   orders = [
     {
       id: Math.floor(Math.random()*100000),
-      cafe, item,
+      cafe,
+      item,
       ordered: orderedISO,
       returned: new Date().toISOString()
     },
@@ -281,66 +421,116 @@ function onMugReturned(){
   renderStatus();
 }
 
-/* Optional console helpers for local testing (no UI controls) */
+/* Exposed demo helpers (for manual + automated component tests) */
 window.demoAssign = function(){
   const pick = cafes[0];
   const now = new Date();
-  const due = new Date(now); due.setDate(due.getDate()+3);
+  const due = new Date(now);
+  due.setDate(due.getDate()+3);
   onMugAssigned({
     id: 'MUG-'+Math.floor(Math.random()*9000+1000),
-    cafe: pick.name, item: 'Latte',
+    cafe: pick.name,
+    item: 'Latte',
     orderedISO: now.toISOString(),
     dueISO: due.toISOString()
   });
 };
-window.demoReturn = function(){ onMugReturned(); };
+window.demoReturn = function(){
+  onMugReturned();
+};
 
-/* SPA nav */
+/* SPA Navigation */
 const views = ['login','dashboard','order','map','past'];
-function setActiveTab(view){ $$('.nav a').forEach(a=>a.classList.toggle('active', a.dataset.nav===view)); }
-function show(view){
-  if(view!=='login' && !state.user){ view = 'login'; }
-  views.forEach(v=>byId('view-'+v).classList.toggle('hidden', v!==view));
-  byId('nav').style.display = (view==='login') ? 'none' : 'flex';
 
-  if(view==='order') renderOrderList(byId('order-q').value||'');
-  if(view==='map')   byId('map-list').innerHTML = cafes.map(cafeRow).join('');
-  if(view==='past')  renderPast();
+function setActiveTab(view){
+  $$('.nav a').forEach(a => {
+    a.classList.toggle('active', a.dataset.nav === view);
+  });
+}
+
+function show(view){
+  if(view !== 'login' && !state.user){
+    view = 'login';
+  }
+  views.forEach(v => {
+    byId('view-'+v).classList.toggle('hidden', v !== view);
+  });
+  byId('nav').style.display = (view === 'login') ? 'none' : 'flex';
+
+  if(view === 'order'){
+    renderOrderList(byId('order-q')?.value || '');
+  }
+  if(view === 'map'){
+    byId('map-list').innerHTML = cafes.map(cafeRow).join('');
+  }
+  if(view === 'past'){
+    renderPast();
+  }
 
   setActiveTab(view);
   window.scrollTo(0,0);
 }
 
 /* Events */
-byId('login-btn').addEventListener('click', ()=>{
-  const val = (byId('login-username').value||'').trim().toLowerCase();
+byId('login-btn').addEventListener('click', () => {
+  const val = (byId('login-username').value || '').trim().toLowerCase();
   const err = byId('login-err');
-  if(val==='demo'){
+  if(val === 'demo'){
     state.user = 'Demo';
-    err.style.display='none';
+    err.style.display = 'none';
     byId('welcome').textContent = `Welcome Back, ${state.user}!`;
     show('dashboard');
     renderStatus();
-  }else{
-    err.style.display='block';
+  } else {
+    err.style.display = 'block';
   }
 });
-$$('[data-nav]').forEach(el=>el.addEventListener('click', ()=>show(el.dataset.nav)));
 
-byId('order-q').addEventListener('input', e=>renderOrderList(e.target.value));
-byId('map-q').addEventListener('input', e=>{
-  const needle = e.target.value.toLowerCase();
-  const filtered = cafes.filter(c => (c.name + ' ' + c.area).toLowerCase().includes(needle));
-  byId('map-list').innerHTML = filtered.map(cafeRow).join('') || `<div class="meta">No results.</div>`;
+$$('[data-nav]').forEach(el => {
+  el.addEventListener('click', () => show(el.dataset.nav));
 });
-$$('.pin').forEach(pin=>{
-  pin.addEventListener('click', ()=>{
-    const c = cafes.find(x=>x.id===pin.dataset.id);
+
+byId('order-q')?.addEventListener('input', e => {
+  renderOrderList(e.target.value);
+});
+byId('map-q')?.addEventListener('input', e => {
+  const needle = e.target.value.toLowerCase();
+  const filtered = cafes.filter(
+    c => (c.name + ' ' + c.area).toLowerCase().includes(needle)
+  );
+  byId('map-list').innerHTML =
+    filtered.map(cafeRow).join('') || `<div class="meta">No results.</div>`;
+});
+$$('.pin').forEach(pin => {
+  pin.addEventListener('click', () => {
+    const c = cafes.find(x => x.id === pin.dataset.id);
     if(!c) return;
     byId('map-q').value = c.name;
     byId('map-list').innerHTML = [c].map(cafeRow).join('');
   });
 });
+
+let lastReturnTsSeen = null;
+
+async function pollMockReturn(){
+  try {
+    const res = await fetch('/mock-return-status');
+    if (!res.ok) return;
+    const data = await res.json();
+
+    // If server reports a new return event, process it once
+    if (data.ts && data.ts !== lastReturnTsSeen) {
+      lastReturnTsSeen = data.ts;
+      onMugReturned();
+      console.log("[Frontend] Detected mock return event at", data.ts);
+    }
+  } catch (e) {
+    // Ignore network errors during demo
+  }
+}
+
+// Poll every 500 ms while app is open
+setInterval(pollMockReturn, 500);
 
 /* Start on login */
 show('login');

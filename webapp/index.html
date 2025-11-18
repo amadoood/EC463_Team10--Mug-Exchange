@@ -413,7 +413,7 @@ function daysOverdue(orderedISO, days=3){
 function cafeRow(c){
   return `
     <div class="card item">
-      <img class="thumb" src="mug.png" alt="">
+      <img class="thumb" src="Assets/mug.png" alt="">
       <div class="item-body">
         <div class="h2">${c.name}</div>
         <div class="meta">${c.area} • ${c.dist} • ${c.mugs} mugs</div>
@@ -440,7 +440,7 @@ function historyRow(o){
     : ` • Returned: ${fmtDate(o.returned)}`;
   return `
     <div class="card item">
-      <img class="thumb" src="mug.png" alt="">
+      <img class="thumb" src="Assets/mug.png" alt="">
       <div class="item-body">
         <div class="h2">${o.item} — ${o.cafe}</div>
         <div class="meta">Ordered: ${fmtDate(o.ordered)}${extra}</div>
@@ -592,5 +592,3 @@ renderPast();       // render seeded history
 </script>
 </body>
 </html>
-
-

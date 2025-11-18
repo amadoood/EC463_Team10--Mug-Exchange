@@ -24,6 +24,8 @@ Schema Details
 | `phone`      | VARCHAR(20) NULL                  | optional                  |
 | `created_at` | TIMESTAMP DEFAULT CURRENT_TIMESTAMP |                           |
 
+The users table stores all identity information, with id as the permanent unique key and email as the unique login. phone is optional for SMS reminders, and created_at is auto-generated for analytics and traceability. Every order and event in the system references a specific user through this table
+
 ## Table: `mugs`
 
 | Column            | Type                                                     | Notes                                           |
@@ -35,6 +37,8 @@ Schema Details
 | `last_event_id`   | INT NULL                                                  | FK → `events.id`                                |
 | `created_at`      | TIMESTAMP DEFAULT CURRENT_TIMESTAMP                       |                                                 |
 | `updated_at`      | TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | auto-updated on changes                |
+
+
 
 ## Table: `orders`
 

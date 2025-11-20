@@ -49,3 +49,10 @@ CREATE TABLE events (
   FOREIGN KEY (order_id) REFERENCES orders(id),
   FOREIGN KEY (device_id) REFERENCES devices(id)
 );
+
+/*
+  Notes from Amado:
+  - Replace location_id in orders table with merchant_id for consistency
+  - Change the primary key id in orders table to order_number, does not need to auto increment
+  - I don't see the point of external_ref in orders
+*/

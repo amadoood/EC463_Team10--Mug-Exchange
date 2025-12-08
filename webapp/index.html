@@ -92,6 +92,15 @@ border-color:var(--red);color:var(--red-dark);background:var(--red-bg)
 .overdue-text{
 color:var(--red-dark);font-weight:600;font-size:.9rem
 }
+.pickup-pill{
+  border: 1px solid #ca8a04;       /* amber-600 border */
+  color: #b45309;                  /* amber-700 text */
+  background: #fef3c7;             /* amber-100 background */
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: .85rem;
+  white-space: nowrap;
+}
 
 /* Map mock */
 .map{
@@ -244,7 +253,7 @@ cafe: 'Starbucks @ GSU',
 item: 'Vanilla Frappe',
 ordered: '2025-12-08T08:25:00',
 returned:'2025-12-08T12:18:00',
-status: 'RETURNED'
+status: 'READY_PICKUP'
 },
 {
 orderId: 'SEED-102',
@@ -405,7 +414,7 @@ if (o.returned) {
 extra = ` • Returned: ${fmtDate(o.returned)}`;
 }
 } else if (o.status === 'READY_PICKUP') {
-pillHTML = `<span class="pill">Ready for pickup</span>`;
+pillHTML = `<span class="pill ready-pill">Ready for pickup</span>`;
 if (overdueDays > 0) {
 extra = ` • <span class="overdue-text">${overdueDays} day${overdueDays>1?'s':''} overdue</span>`;
 }

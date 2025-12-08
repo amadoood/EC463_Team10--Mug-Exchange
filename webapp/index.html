@@ -255,15 +255,6 @@ ordered: '2025-10-01T08:25:00',
 returned:'2025-10-01T12:18:00',
 status: 'RETURNED'
 },
-{
-orderId: 'SEED-103',
-mugId: 'MUG-103',
-cafe: 'Blue Bottle — Kenmore',
-item: 'Cold Brew',
-ordered: '2025-09-30T10:04:00',
-returned:null,
-status: 'OVERDUE'
-}
 ];
 
 const cafes = [
@@ -284,7 +275,7 @@ const $$ = s => [...document.querySelectorAll(s)];
 const byId = id => document.getElementById(id);
 
 /* ========= socket.io integration with Amado's server ========= */
-const IP_ADDRESS = "10.103.82.43";
+const IP_ADDRESS = "172.20.10.13";
 const SOCKET_URL = `http://${IP_ADDRESS}:3000`;
 let socket = null;
 

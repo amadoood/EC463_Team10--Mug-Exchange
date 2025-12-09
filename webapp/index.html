@@ -410,7 +410,7 @@ if (o.returned) {
 extra = ` • Returned: ${fmtDate(o.returned)}`;
 }
 } else if (o.status === 'READY_PICKUP') {
-pillHTML = `<span class="pill ready-pill">Ready for pickup</span>`;
+pillHTML = `<span class="pill pickup-pill">Ready for pickup</span>`;
 if (overdueDays > 0) {
 extra = ` • <span class="overdue-text">${overdueDays} day${overdueDays>1?'s':''} overdue</span>`;
 }

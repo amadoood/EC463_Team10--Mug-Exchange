@@ -92,6 +92,11 @@ border-color:var(--red);color:var(--red-dark);background:var(--red-bg)
 .overdue-text{
 color:var(--red-dark);font-weight:600;font-size:.9rem
 }
+.pickup-pill{
+  border-color: #fbbf24;       /* amber-600 border */
+  color: #b45309;                  /* amber-700 text */
+  background: #fef3c7;             /* amber-100 background */
+}
 
 /* Map mock */
 .map{
@@ -241,29 +246,29 @@ let orders = [
 orderId: 'SEED-101',
 mugId: 'MUG-101',
 cafe: 'Starbucks @ GSU',
+item: 'Pecan Crunch Oatmilk Latte',
+ordered: '2025-12-08T08:25:00',
+returned:'2025-12-08T12:18:00',
+status: 'READY_PICKUP'
+},
+{
+orderId: 'SEED-102',
+mugId: 'MUG-102',
+cafe: 'Starbucks @ GSU',
 item: 'Latte',
 ordered: '2025-10-02T09:41:00',
 returned:'2025-10-02T15:05:00',
 status: 'RETURNED'
 },
 {
-orderId: 'SEED-102',
-mugId: 'MUG-102',
+orderId: 'SEED-103',
+mugId: 'MUG-103',
 cafe: 'Pavement Coffeehouse',
 item: 'Black Coffee',
 ordered: '2025-10-01T08:25:00',
 returned:'2025-10-01T12:18:00',
 status: 'RETURNED'
 },
-{
-orderId: 'SEED-103',
-mugId: 'MUG-103',
-cafe: 'Blue Bottle — Kenmore',
-item: 'Cold Brew',
-ordered: '2025-09-30T10:04:00',
-returned:null,
-status: 'OVERDUE'
-}
 ];
 
 const cafes = [
@@ -284,7 +289,7 @@ const $$ = s => [...document.querySelectorAll(s)];
 const byId = id => document.getElementById(id);
 
 /* ========= socket.io integration with Amado's server ========= */
-const IP_ADDRESS = "10.103.82.43";
+const IP_ADDRESS = "172.20.10.13";
 const SOCKET_URL = `http://${IP_ADDRESS}:3000`;
 let socket = null;
 
@@ -405,7 +410,7 @@ if (o.returned) {
 extra = ` • Returned: ${fmtDate(o.returned)}`;
 }
 } else if (o.status === 'READY_PICKUP') {
-pillHTML = `<span class="pill">Ready for pickup</span>`;
+pillHTML = `<span class="pill pickup-pill">Ready for pickup</span>`;
 if (overdueDays > 0) {
 extra = ` • <span class="overdue-text">${overdueDays} day${overdueDays>1?'s':''} overdue</span>`;
 }

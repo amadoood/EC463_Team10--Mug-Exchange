@@ -284,7 +284,7 @@ const $$ = s => [...document.querySelectorAll(s)];
 const byId = id => document.getElementById(id);
 
 /* ========= socket.io integration with Amado's server ========= */
-const IP_ADDRESS = "10.103.82.43";
+const IP_ADDRESS = "localhost";
 const SOCKET_URL = `http://${IP_ADDRESS}:3000`;
 let socket = null;
 
@@ -309,22 +309,21 @@ console.log('[socket] disconnected');
 socket.on('orderUpdate', (payload) => {
 console.log('[socket] orderUpdate received:', payload);
 
-const status = payload.status;
-const orderId = payload.orderId || payload.mugId || 'MUG-UNKNOWN';
-const mugId = payload.mugId || orderId;
-
-if (status === 'READY_PICKUP') {
+if (payload.status === 'READY_PICKUP') {
 console.log('Order is ready for pickup');
+
 onMugAssigned({
-mugId,
-orderId,
+mugId: payload.mugId || 'MUG_UNKNOWN',
+orderId: payload.orderId, //For now
 cafe: payload.merchant_name || 'Partner Café',
 item: payload.Item || 'Drink',
 orderedISO: payload.orderTime || new Date().toISOString(),
 dueISO: new Date(Date.now()+3*24*60*60*1000).toISOString()
 });
 } else if (status === 'RETURNED') {
+
 console.log('Order has returned');
+
 onMugReturned(orderId);
 } else {
 // Other statuses still get logged into history

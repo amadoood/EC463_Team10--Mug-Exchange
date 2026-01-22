@@ -305,6 +305,7 @@
     /* --- socket.io integration --- */
     let socket = null;
     function setupSocket(){
+        console.log("Attempting to setup socket");
         const token = sessionStorage.getItem("authToken");
         try {
             socket = io(SOCKET_URL, {
@@ -340,7 +341,7 @@
                 }
 
             });
-        } catch(e) { console.warn('[socket] setup error', e); }
+        } catch(e) { console.error('[socket] setup error:', e); }
     }
 
     /* --- formatters & logic --- */

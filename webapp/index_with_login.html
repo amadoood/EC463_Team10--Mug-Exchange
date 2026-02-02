@@ -218,7 +218,7 @@
         <div class="card center">
             <h2 class="h1" id="welcome">Welcome Back!</h2>
 
-            <div id="status" class="status-banner">
+            <div id="status-container" class="status-banner">
                 <div class="title">Mug Status</div>
                 <div id="status-text" class="status-none">
                     No active mug. Place an order to get started.
@@ -262,7 +262,7 @@
     </main>
 
     <nav class="nav" id="nav" style="display:none">
-        <a data-nav="login">Login</a>
+        <a data-nav="logout">Logout</a>
         <a data-nav="dashboard">Home</a>
         <a data-nav="order">Order</a>
         <a data-nav="map">Map</a>
@@ -273,203 +273,170 @@
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" crossorigin="anonymous"></script>
 
 <script>
-    /* --- constants & data --- */
-    const MUG_SRC = 'Assets/mug.png';
-    const IP_ADDRESS = "localhost";
-    const SOCKET_URL = `http://${IP_ADDRESS}:3000`;
+/* --- constants & data --- */
+const IP_ADDRESS = "localhost";
+const SOCKET_URL = `http://${IP_ADDRESS}:3000`;
+const MUG_SRC = 'Assets/mug.png';
 
-    let orders = [
-        { orderId: 'SEED-101', mugId: 'MUG-101', cafe: 'Starbucks @ GSU', item: 'Latte', ordered: '2025-10-02T09:41:00', returned:'2025-10-02T15:05:00', status: 'RETURNED' },
-        { orderId: 'SEED-102', mugId: 'MUG-102', cafe: 'Pavement Coffeehouse', item: 'Black Coffee', ordered: '2025-10-01T08:25:00', returned:'2025-10-01T12:18:00', status: 'RETURNED' },
-        { orderId: 'SEED-103', mugId: 'MUG-103', cafe: 'Blue Bottle — Kenmore', item: 'Cold Brew', ordered: '2025-09-30T10:04:00', returned:null, status: 'OVERDUE' }
-    ];
+/* --- dom helpers --- */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const byId = id => document.getElementById(id);
 
-    const cafes = [
-        { id:'gsu-starbucks', name:'Starbucks @ GSU', area:'Boston University', dist:'0.1 mi', mugs:14, url:'https://www.starbucks.com' },
-        { id:'pavement', name:'Pavement Coffeehouse', area:'Commonwealth Ave', dist:'0.3 mi', mugs:8, url:'https://pavementcoffeehouse.com' },
-        { id:'bluebottle', name:'Blue Bottle — Kenmore', area:'Kenmore', dist:'0.7 mi', mugs:0, url:'https://bluebottlecoffee.com' },
-        { id:'cfa', name:'CFA Café', area:'College of Fine Arts', dist:'0.4 mi', mugs:5, url:'https://www.bu.edu/cfa' }
-    ];
+/* --- api & socket.io integration --- */
+let socket = null;
+let orders = []; // Re-introduced but initialized as empty
 
-    const state = {
-        user: null,
-        activeMugs: {}, 
-        lastActiveOrderId: null 
-    };
+const state = {
+    user: null,
+    lastActiveOrderId: null 
+};
 
-    /* --- dom helpers --- */
-    const $ = s => document.querySelector(s);
-    const $$ = s => [...document.querySelectorAll(s)];
-    const byId = id => document.getElementById(id);
-
-    /* --- socket.io integration --- */
-    let socket = null;
-    function setupSocket(){
-        console.log("Attempting to setup socket");
-        const token = sessionStorage.getItem("authToken");
-        try {
-            socket = io(SOCKET_URL, {
-                transports: ['websocket'],
-                reconnection: true,
-                auth: {
-                    token: token
-                }
-            });
-
-            socket.on('orderUpdate', (payload) => {
-
-                const { status, orderId, mugId } = payload;
-                if (status === 'READY_PICKUP') {
-                    onMugAssigned({
-                        mugId: mugId || 'MUG_UNKNOWN',
-                        orderId: orderId,
-                        cafe: payload.merchant_name || 'Partner Café',
-                        item: payload.Item || 'Drink',
-                        orderedISO: payload.orderTime || new Date().toISOString(),
-                        dueISO: new Date(Date.now()+3*24*60*60*1000).toISOString()
-                    });
-                } else if (status === 'RETURNED') {
-                    onMugReturned(orderId);
-                } else {
-                    upsertOrder({
-                        orderId, mugId,
-                        cafe: payload.merchant_name || 'Partner Café',
-                        item: payload.Item || 'Drink',
-                        ordered: payload.orderTime || new Date().toISOString(),
-                        returned: null, status: status || 'IN_PROGRESS'
-                    });
-                }
-
-            });
-        } catch(e) { console.error('[socket] setup error:', e); }
-    }
-
-    /* --- formatters & logic --- */
-    function fmtDate(s) {
-        const d = new Date(s);
-        return d.toLocaleString([], { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
-    }
-
-    function daysOverdue(orderedISO, days=3) {
-        if (!orderedISO) return 0;
-        const due = new Date(orderedISO);
-        due.setDate(due.getDate() + days);
-        const now = new Date();
-        return now <= due ? 0 : Math.ceil((now - due) / (1000*60*60*24));
-    }
-
-    /* --- ui rendering --- */
-    function cafeRow(c) {
-        return `
-        <div class="card item">
-            <img class="thumb" src="${MUG_SRC}" alt="">
-            <div class="item-body">
-                <div class="h2">${c.name}</div>
-                <div class="meta">${c.area} • ${c.dist} • ${c.mugs} mugs</div>
-            </div>
-            <a class="btn" href="${c.url}" target="_blank" rel="noopener">Order</a>
-        </div>`;
-    }
-
-    function historyRow(o) {
-        const overdueDays = (!o.returned && o.ordered) ? daysOverdue(o.ordered,3) : 0;
-        let pillHTML = '', extra = '';
-
-        if (o.status === 'RETURNED') {
-            pillHTML = `<span class="pill">Returned</span>`;
-            if (o.returned) extra = ` • Returned: ${fmtDate(o.returned)}`;
-        } else if (o.status === 'READY_PICKUP') {
-            pillHTML = `<span class="pill">Ready for pickup</span>`;
-            if (overdueDays > 0) extra = ` • <span class="overdue-text">${overdueDays} day${overdueDays>1?'s':''} overdue</span>`;
-        } else if (overdueDays > 0) {
-            pillHTML = `<span class="pill overdue-pill">Overdue</span>`;
-            extra = ` • <span class="overdue-text">${overdueDays} day${overdueDays>1?'s':''} overdue</span>`;
-        } else {
-            pillHTML = `<span class="pill">In progress</span>`;
-        }
-
-        return `
-        <div class="card item">
-            <img class="thumb" src="${MUG_SRC}" alt="">
-            <div class="item-body">
-                <div class="h2">${o.item} — ${o.cafe}</div>
-                <div class="meta">Ordered: ${fmtDate(o.ordered)}${extra}</div>
-            </div>
-            ${pillHTML}
-        </div>`;
-    }
-
-    function renderOrderList(q=''){
-        const needle = q.trim().toLowerCase();
-        const filtered = cafes.filter(c => (c.name + ' ' + c.area).toLowerCase().includes(needle));
-        byId('order-list').innerHTML = filtered.map(cafeRow).join('') || `<div class="meta">No results.</div>`;
-        byId('order-count').textContent = `${filtered.length} café${filtered.length!==1?'s':''}`;
-    }
-
-    function renderPast(){
-        byId('past-list').innerHTML = orders.map(historyRow).join('');
-    }
-
-    function renderStatus(){
-        const el = byId('status-text');
-        const key = state.lastActiveOrderId;
-        const s = key ? state.activeMugs[key] : null;
-
-        if(!s){
-            el.className = 'status-none';
-            el.textContent = 'No active mug. Place an order to get started.';
-            return;
-        }
-        const dueStr = new Date(s.dueISO).toLocaleString([], { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
-        el.className = 'status-good';
-        el.innerHTML = `Checked out <b>${s.item}</b> at <b>${s.cafe}</b> • Mug ID <b>${s.orderId}</b><br>Due by <b>${dueStr}</b>`;
-    }
-
-    /* --- app hooks --- */
-    function upsertOrder(order){
-        const idx = orders.findIndex(o => o.orderId === order.orderId);
-        if (idx === -1) { orders = [order, ...orders]; } else { orders[idx] = order; }
-        renderPast();
-    }
-
-    function onMugAssigned({ mugId, orderId, cafe, item, orderedISO, dueISO }){
-        const key = orderId || 'MUG-UNKNOWN';
-        const order = { mugId: mugId || key, orderId: key, cafe, item, ordered: orderedISO, dueISO, returned: null, status: 'READY_PICKUP' };
-        state.activeMugs[key] = order;
-        state.lastActiveOrderId = key;
-        upsertOrder(order);
-        renderStatus();
-    }
-
-    function onMugReturned(orderId){
-        const key = orderId || state.lastActiveOrderId;
-        const mug = state.activeMugs[key] || orders.find(o => o.orderId === key);
-        if (!mug) return;
-
-        const updated = { ...mug, status: 'RETURNED', returned: new Date().toISOString() };
-        delete state.activeMugs[key];
-        if (state.lastActiveOrderId === key) state.lastActiveOrderId = null;
-
-        upsertOrder(updated);
-        renderStatus();
-    }
-
-    /* --- navigation --- */
-    function show(view){
-        if(view !== 'login' && view !== 'signup' && !state.user) view = 'login';
-        ['login','signup','dashboard','order','map','past'].forEach(v => {
-            byId('view-'+v).classList.toggle('hidden', v !== view);
+function setupSocket() {
+    console.log("Setting up multi-user socket");
+    const token = sessionStorage.getItem("authToken");
+    
+    try {
+        socket = io(SOCKET_URL, {
+            transports: ['websocket'],
+            auth: { token: token }
         });
 
-        byId('nav').style.display = (view === 'login') ? 'none' : 'flex';
-        $$('.nav a').forEach(a => a.classList.toggle('active', a.dataset.nav === view));
+        socket.on('orderUpdate', (payload) => {
+            // Update the specific order in our local list
+            updateOrderInList(payload);
+        });
 
-        if(view === 'order') renderOrderList(byId('order-q')?.value || '');
-        if(view === 'map') byId('map-list').innerHTML = cafes.map(cafeRow).join('');
-        if(view === 'past') renderPast();
-        window.scrollTo(0,0);
+    } catch(e) { console.error('[socket] error:', e); }
+}
+
+/* --- State Management --- */
+
+function updateOrderInList(updatedData) {
+    const idx = orders.findIndex(o => o.orderId === updatedData.orderId);
+    
+    if (idx !== -1) {
+        // Update existing order
+        orders[idx] = { ...orders[idx], ...updatedData };
+    } else {
+        // New order came in via socket
+        orders = [updatedData, ...orders];
     }
 
+    // Refresh whichever view is currently visible
+    refreshAllUI();
+}
+
+/* --- UI Rendering --- */
+
+function refreshAllUI() {
+    renderDashboard();
+    renderPastOrders();
+}
+
+function renderDashboard() {
+    const container = byId('status-container');
+    if (!container) return;
+
+    // Filter for active orders (NOT returned)
+    const active = orders.filter(o => o.status !== 'MUG_RETURNED');
+    
+    if (active.length === 0) {
+        container.innerHTML = '<div class="status-none">No active mugs. Place an order to start!</div>';
+    } else {
+        container.innerHTML = active.map(o => {
+            // Using the "item" layout to match renderPastOrders exactly
+            return `
+            <div class="card item">
+                <img class="thumb" src="${MUG_SRC}" alt="Mug Icon">
+                <div class="item-body">
+                    <div class="h2">${o.mug_id} — ${o.merchant_id}</div>
+                    <div class="meta">Due: ${o.due || 'TBD'}</div>
+                </div>
+                <span class="pill">${o.status}</span>
+            </div>`;
+        }).join('');
+    }
+}
+
+function renderPastOrders() {
+    const container = byId('past-list');
+    if (!container) return;
+
+    // Filter for returned orders
+    const returned = orders.filter(o => o.status === 'MUG_RETURNED');
+    container.innerHTML = returned.map(historyRow).join('') || `<div class="meta">No past orders yet.</div>`;
+}
+
+/* --- formatters & logic --- */
+function fmtDate(s) {
+    if (!s) return 'N/A';
+    const d = new Date(s);
+    return d.toLocaleString([], { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
+}
+
+function historyRow(o) {
+    return `
+    <div class="card item">
+        <img class="thumb" src="${MUG_SRC}" alt="Mug Icon">
+        <div class="item-body">
+            <div class="h2">${o.mug_id} — ${o.merchant_id}</div>
+            <div class="meta">Ordered: //</div>
+        </div>
+        <span class="pill">Returned</span>
+    </div>`;
+}
+
+
+/* --- navigation --- */
+function show(view) {
+    // If user is attempting to logout, kill socket connection
+    if (view === 'logout' && state.user) {
+        console.log("User logging out. Cleaning up...");
+        
+        // 1. Disconnect the socket
+        if (socket) {
+            socket.disconnect();
+            socket = null;
+        }
+        
+        // 2. Clear local state and session
+        state.user = null;
+        orders = []; 
+        sessionStorage.removeItem("authToken");
+        
+        // 3. Reset the Nav text back to 'Login'
+        const loginLink = document.querySelector('.nav a[data-nav="login"]');
+        if (loginLink) loginLink.textContent = 'Login';
+    }
+
+    // 1. Auth Guard: Redirect to login if user isn't set
+    if (view !== 'login' && view !== 'signup' && !state.user) view = 'login';
+    
+    // 2. View Switching: Hide all, then show the requested view
+    ['login', 'signup', 'dashboard', 'order', 'map', 'past'].forEach(v => {
+        const el = byId('view-' + v);
+        if (el) el.classList.toggle('hidden', v !== view);
+    });
+
+    // 3. UI Cleanup: Only show the nav bar if we aren't on the auth screens
+    byId('nav').style.display = (view === 'login' || view === 'signup') ? 'none' : 'flex';
+    
+    // 4. Update Nav active state
+    $$('.nav a').forEach(a => a.classList.toggle('active', a.dataset.nav === view));
+
+    // 5. Data Rendering: IMPORTANT 
+    // Whenever we switch to the Dashboard or Past orders, 
+    // we run refreshAllUI to draw the current state of our 'orders' array.
+    if (view === 'dashboard' || view === 'past') {
+        refreshAllUI(); 
+    }
+    
+    // If you still have the café search feature
+    if (view === 'order') renderOrderList(byId('order-q')?.value || '');
+    
+    window.scrollTo(0, 0);
+}   
     /* --- events --- */
     byId('login-btn').addEventListener('click', async () => {
         const username = byId('login-username').value;
@@ -478,50 +445,36 @@
         try {
             const res = await fetch(`${SOCKET_URL}/login`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({username, password})
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password })
             });
 
             if (!res.ok) {
-                byId('login-err').style.display='block';
-            } 
-            else {
-
+                byId('login-err').style.display = 'block';
+            } else {
                 const data = await res.json();
-                const token = data.token;
+                
+                // 1. Save Token
+                sessionStorage.setItem("authToken", data.token);
 
-                sessionStorage.setItem("authToken", token);
+                // 2. Hydrate Orders from Login Response
+                // Expecting server to return: { token: "...", orders: [...] }
+                orders = data.orders || [];
 
+                // 3. Set local state
                 state.user = username;
-                byId('login-err').style.display='none';
                 byId('welcome').textContent = `Welcome Back, ${state.user}!`;
 
+                // 4. Initialize UI and Socket
                 setupSocket();
                 show('dashboard');
-                renderStatus();
+                refreshAllUI();
             }
-
         } catch (err) {
-            console.error(err);
-        };
-    })
-
-    /*
-    byId('login-btn').addEventListener('click', ()=>{
-        const val = (byId('login-username').value || '').trim().toLowerCase();
-        if(val === 'demo'){
-            state.user = 'Demo';
-            byId('login-err').style.display='none';
-            byId('welcome').textContent = `Welcome Back, ${state.user}!`;
-            show('dashboard');
-            renderStatus();
-        } else {
-            byId('login-err').style.display='block';
+            console.error("Login Error:", err);
         }
     });
-    */
+
     byId('btn-goto-signup').addEventListener('click', () => {
     show('signup');
     });
@@ -591,7 +544,6 @@
 
     /* --- start --- */
     show('login');
-    renderPast();
 </script>
 </body>
 </html>

@@ -11,7 +11,7 @@ import time, urequests
 # -------------------------------------------------------
 # BACKEND ENDPOINT  (EDIT THIS ONLY)
 # -------------------------------------------------------
-BACKEND_URL = "http://10.156.6.43:3000/return"
+BACKEND_URL = "http://172.20.10.13:3000/return"
 
 
 # -------------------------------
@@ -56,13 +56,19 @@ def flash(pin, duration=0.25):
 
 def send_to_backend(packet):
     """Send mug+RFID data to backend server."""
+    t0 = time.ticks_ms()
+    
     try:
         print("→ Sending to backend:", packet)
         response = urequests.post(BACKEND_URL, json=packet)
-        print("→ Server response:", response.text)
+        backend_latency_ms = time.ticks_diff(time.ticks_ms(), t0)
+
+        print("→ Server response:", response.text, f"| latency={backend_latency_ms} ms")
         response.close()
+        
     except Exception as e:
-        print("❌ Backend send failed:", e)
+        backend_latency_ms = time.ticks_diff(time.ticks_ms(), t0)
+        print(f"❌ Backend send failed | latency={backend_latency_ms} ms | {e}")
         flash(red)
         time.sleep(0.2)
         flash(red)
@@ -73,7 +79,8 @@ def send_to_backend(packet):
 # Mug must stay ≥3 seconds. Only detect again after removal.
 # =======================================================
 
-MUG_THRESHOLD_MS = 2000  # must stay 3 sec to count
+MUG_THRESHOLD_MS = 2000  # must stay 2 sec to count
+
 
 processing = False
 waiting_for_removal = False
@@ -84,7 +91,7 @@ print("===============================================")
 print("System ready — waiting for mugs...\n")
 
 count = 0
-limit = 2
+limit = 3
 
 
 # =======================================================
@@ -98,6 +105,7 @@ while count < limit:
     if sensor.value() == 0 and not processing and not waiting_for_removal:
         print("Beam broken — mug entering...")
         start = time.ticks_ms()
+        beam_break = start
         processing = True
 
         # Stay inside while mug remains present
@@ -136,7 +144,8 @@ while count < limit:
                 # Successful scan
                 # -----------------------------
                 if tag_detected:
-                    print(f"  [{timestamp}] ✅ RFID SUCCESS | {tag_id} | '{tag_text}'")
+                    scan_latency_ms = time.ticks_diff(time.ticks_ms(), beam_break)
+                    print(f"  [{timestamp}] ✅ RFID SUCCESS | {tag_id} | '{tag_text}' | latency={scan_latency_ms} ms")
                     flash(green)
                     #beep(0.15)
 
@@ -155,7 +164,7 @@ while count < limit:
                 else:
                     print(f"  [{timestamp}] ❌ RFID FAIL | No tag detected")
                     flash(red)
-                    beep(0.1)
+                    #beep(0.1)
 
                 # Must wait until mug is removed
                 waiting_for_removal = True

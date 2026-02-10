@@ -1,4 +1,7 @@
 # =======================================================
+# Mug Detection + RFID Scan + Backend Packet Sender
+# Raspberry Pi Pico 2 W
+# =======================================================
 
 from machine import Pin, SPI
 from mfrc522 import SimpleMFRC522
@@ -8,7 +11,7 @@ import time, urequests
 # -------------------------------------------------------
 # BACKEND ENDPOINT  (EDIT THIS ONLY)
 # -------------------------------------------------------
-BACKEND_URL = "http://172.20.10.13:3000/return"
+BACKEND_URL = "http://10.156.6.43:3000/return"
 
 
 # -------------------------------
@@ -70,7 +73,7 @@ def send_to_backend(packet):
 # Mug must stay ≥3 seconds. Only detect again after removal.
 # =======================================================
 
-MUG_THRESHOLD_MS = 3000  # must stay 3 sec to count
+MUG_THRESHOLD_MS = 2000  # must stay 3 sec to count
 
 processing = False
 waiting_for_removal = False
@@ -103,7 +106,7 @@ while count < limit:
             elapsed = time.ticks_diff(time.ticks_ms(), start)
 
             if elapsed >= MUG_THRESHOLD_MS:
-                beep(0.3)
+                #beep(0.3)
                 count += 1
                 print(f"\n[Mug {count}] Confirmed mug ({elapsed} ms)")
 
@@ -135,7 +138,7 @@ while count < limit:
                 if tag_detected:
                     print(f"  [{timestamp}] ✅ RFID SUCCESS | {tag_id} | '{tag_text}'")
                     flash(green)
-                    beep(0.15)
+                    #beep(0.15)
 
                     # Build packet + SEND
                     packet = {
@@ -143,6 +146,8 @@ while count < limit:
                         "rfid_data": tag_text,
                     }
                     send_to_backend(packet)
+                    flash(green)
+                    beep(0.15)
 
                 # -----------------------------
                 # Failed scan

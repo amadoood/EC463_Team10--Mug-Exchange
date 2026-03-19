@@ -1,0 +1,149 @@
+#!/usr/bin/env python3
+"""
+final.py
+- Waits for an RC522 RFID UID tap (UID only, no auth) and formats as Pico-style hex (FIRST 4 bytes)
+- THEN captures an image using rpicam-still
+- Runs Google Vision OCR via gcloud CLI
+
+"""
+
+import json
+import subprocess
+import sys
+import time
+from datetime import datetime
+
+import requests
+
+import RPi.GPIO as GPIO
+from mfrc522 import MFRC522
+
+
+# ----------------------------- CONFIG ---------------------------------
+BACKEND_URL = "http://172.20.10.13:3000/ocr"  \
+IMAGE_PATH = "ocr_test.jpg"
+
+# Camera capture options
+CAM_WIDTH = 3280
+CAM_HEIGHT = 2464
+CAM_TIMEOUT_MS = 500
+CAM_EXTRA_ARGS = []
+
+# RFID options
+RFID_COOLDOWN_SECONDS = 0.0
+RFID_FORCE_NBYTES = 4         
+RFID_SCAN_TIMEOUT_S = 0.0     
+# ----------------------------------------------------------------------
+
+
+def run(cmd: list[str]) -> str:
+    p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    if p.returncode != 0:
+        raise RuntimeError(f"Command failed:\n  {' '.join(cmd)}\n\nSTDERR:\n{p.stderr}")
+    return p.stdout
+
+
+def capture_image(path: str) -> None:
+    print("Capturing image...")
+    cmd = [
+        "rpicam-still",
+        "-o", path,
+        "--width", str(CAM_WIDTH),
+        "--height", str(CAM_HEIGHT),
+        "--timeout", str(CAM_TIMEOUT_MS),
+        "--nopreview",
+    ] + CAM_EXTRA_ARGS
+    run(cmd)
+
+
+def gcloud_vision_ocr(image_path: str) -> dict:
+    print("Running OCR...")
+    out = run(["gcloud", "ml", "vision", "detect-text", image_path, "--format=json"])
+    data = json.loads(out)
+    return {"gcloud_result": data}
+
+
+def uid_to_pico_hex_4(uid_bytes: list[int]) -> str:
+    b = bytes(uid_bytes)
+    b4 = b[:RFID_FORCE_NBYTES] 
+    return " ".join(f"{x:02X}" for x in b4)
+
+
+def scan_rfid_uid_hex4(timeout_s: float = 0.0) -> str:
+    """
+    Scan UID only (no auth) and return Pico-style hex string (FIRST 4 bytes).
+    timeout_s = 0 means wait forever.
+    """
+    print("Ready. Tap an RFID tag to start OCR...")
+    rdr = MFRC522()
+    start = time.time()
+    last_time = 0.0
+
+    while True:
+        if timeout_s and (time.time() - start) > timeout_s:
+            raise TimeoutError("No RFID tag detected within timeout window.")
+
+        (status, _tag_type) = rdr.MFRC522_Request(rdr.PICC_REQIDL)
+        if status != rdr.MI_OK:
+            time.sleep(0.05)
+            continue
+
+        (status, uid) = rdr.MFRC522_Anticoll()
+        if status != rdr.MI_OK or not uid:
+            time.sleep(0.05)
+            continue
+
+        now = time.time()
+        if RFID_COOLDOWN_SECONDS > 0 and (now - last_time) < RFID_COOLDOWN_SECONDS:
+            time.sleep(0.05)
+            continue
+
+        uid_hex4 = uid_to_pico_hex_4(uid)
+
+        # Optional debug: show both raw UID bytes and what we will send
+        print(f"RFID UID (raw bytes): {' '.join(f'{x:02X}' for x in uid)}")
+        print(f"RFID UID (pico hex, FIRST 4 bytes): {uid_hex4}")
+
+        return uid_hex4
+
+
+def post_json(url: str, payload: dict) -> None:
+    print(f"Posting to {url} ...")
+    resp = requests.post(url, json=payload, timeout=20)
+    print("Backend status:", resp.status_code)
+    print(resp.text)
+    resp.raise_for_status()
+
+
+def main():
+    try:
+        # 1) RFID FIRST (waits)
+        mug_rfid = scan_rfid_uid_hex4(timeout_s=RFID_SCAN_TIMEOUT_S)
+
+        # 2) Capture after RFID tap
+        capture_image(IMAGE_PATH)
+
+        # 3) OCR
+        ocr_json = gcloud_vision_ocr(IMAGE_PATH)
+
+        # 4) Build payload + send
+        payload = {
+            "rfid": mug_rfid,      
+            "ocr": ocr_json,
+            "image": IMAGE_PATH,
+            "timestamp": datetime.now().isoformat(timespec="seconds"),
+        }
+
+        post_json(BACKEND_URL, payload)
+        return 0
+
+    except Exception as e:
+        print("\nERROR:", str(e))
+        return 1
+
+    finally:
+        GPIO.cleanup()
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -93,7 +93,13 @@ function App() {
   const [toastMessage, setToastMessage] = useState("");
 
   const activeOrders = useMemo(
-    () => orders.filter((o) => o.status !== "MUG_RETURNED"),
+    () => orders
+      .filter((o) => o.status !== "MUG_RETURNED")
+      .sort((a, b) => {
+        const aReady = a.status === "READY_PICKUP" ? 0 : 1;
+        const bReady = b.status === "READY_PICKUP" ? 0 : 1;
+        return aReady - bReady;
+      }),
     [orders]
   );
   const returnedOrders = useMemo(

@@ -41,7 +41,7 @@ export default function DashboardView({ visible, user, displayName, activeOrders
       <div className="section-label">Overview</div>
       <div className="quick-stats">
         <div className="stat-card">
-          <div className="stat-num">{activeOrders.length}</div>
+          <div className="stat-num">{activeOrders.filter(o => o.status === "READY_PICKUP").length}</div>
           <div className="stat-label">Active mugs</div>
         </div>
         <div className="stat-card stat-card-accent">

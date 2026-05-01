@@ -146,7 +146,7 @@ app.post('/pickup', async (req, res) => {
     const pickup_payload = req.body;
     const order = await findOrderFromChit(pickup_payload.ocr.gcloud_result);
 
-    if(order) {
+    if(order && order.status == "IN_PROGRESS") {
         res.status(200).json({message: "Pickup RFID received"});
     }
     else {
@@ -229,8 +229,6 @@ app.post('/login', async (req, res) => {
     const uid = user.user_id;
     const phone = user.phone_number;
     const display_name = user.name;
-
-    
 
     const token = crypto.randomUUID();
     await db.addUserToken(uid, token);

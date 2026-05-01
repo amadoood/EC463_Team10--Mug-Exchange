@@ -3,12 +3,12 @@ export const SERVER_URL = "https://ec463-diallo-amado.onrender.com";
 
 // Each coffee has a global menu entry
 export const coffees = [
-  { id: "Iced Cappuchino",            label: "Iced Cappuccino",        blurb: "Equal parts espresso, foamy milk, and cold water",        price: 4.19, emoji: "🧊" },
-  { id: "Pecan Crunch Oatmilk Latte", label: "Pecan Crunch Oat Latte", blurb: "Espresso with oat milk and a shot of pecan flavor",       price: 5.75, emoji: "🌰" },
-  { id: "Espresso",                   label: "Espresso",               blurb: "A concentrated double shot, pure and simple",              price: 3.50, emoji: "☕" },
-  { id: "Cold Brew",                  label: "Cold Brew",              blurb: "Steeped 18 hours for smooth, rich flavor",                price: 4.75, emoji: "🫙" },
-  { id: "Matcha Latte",               label: "Matcha Latte",           blurb: "Ceremonial grade matcha with steamed oat milk",           price: 5.25, emoji: "🍵" },
-  { id: "Cortado",                    label: "Cortado",                blurb: "Equal parts espresso and warm milk, no foam",             price: 4.00, emoji: "☕" },
+  { id: "Black Coffee",                 label: "Black Coffee",                 blurb: "Classic hot coffee",                                      price: 4.19, emoji: "☕" },
+  { id: "Decaf Black Coffee",           label: "Decaf Black Coffee",           blurb: "Classic hot coffee, minus the caffeine",                  price: 4.19, emoji: "☕" },
+  { id: "Black Coffee w/ Cream",        label: "Black Coffee w/ Creamer",      blurb: "Classic hot coffee with creamer",                         price: 5.25, emoji: "☕" },
+  { id: "Decaf Black Coffee w/ Cream",  label: "Decaf Black Coffee w/ Cream",  blurb: "Classic hot coffee with creamer, minus the caffeine",     price: 5.25, emoji: "☕" },
+  //{ id: "Matcha Latte",               label: "Matcha Latte",              blurb: "Ceremonial grade matcha with steamed oat milk",           price: 5.25, emoji: "🍵" },
+  //{ id: "Cortado",                    label: "Cortado",                   blurb: "Equal parts espresso and warm milk, no foam",             price: 4.00, emoji: "☕" },
 ];
 
 // Real coordinates around BU / Kenmore area Boston

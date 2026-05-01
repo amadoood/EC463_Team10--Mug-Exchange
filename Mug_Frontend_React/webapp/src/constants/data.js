@@ -23,8 +23,8 @@ export const cafes = [
     mugs: 14,
     lat: 42.35105145014871,
     lng: -71.10903023360551,
-    menu: ["Iced Cappuchino", "Pecan Crunch Oatmilk Latte", "Espresso", "Cold Brew"],
-  },  
+    menu: ["Black Coffee", "Decaf Black Coffee", "Black Coffee w/ Cream", "Decaf Black Coffee w/ Cream"],
+  },
   {
     id: "pavement",
     name: "Pavement Coffeehouse",
@@ -34,8 +34,8 @@ export const cafes = [
     mugs: 8,
     lat: 42.34991986265836,
     lng: -71.10727664951213,
-    menu: ["Iced Cappuchino", "Cold Brew", "Matcha Latte", "Cortado"],
-  }, 
+    menu: ["Black Coffee", "Decaf Black Coffee", "Black Coffee w/ Cream", "Decaf Black Coffee w/ Cream"],
+  },
   {
     id: "bluebottle",
     name: "Saxby's at BU",
@@ -45,8 +45,8 @@ export const cafes = [
     mugs: 0,
     lat: 42.35024275463619,
     lng: -71.10314002716507,
-    menu: ["Espresso", "Cold Brew", "Cortado"],
-  }, 
+    menu: ["Black Coffee", "Decaf Black Coffee", "Black Coffee w/ Cream", "Decaf Black Coffee w/ Cream"],
+  },
   {
     id: "cfa",
     name: "Cafe 472",
@@ -56,8 +56,8 @@ export const cafes = [
     mugs: 5,
     lat: 42.34895964885412,
     lng: -71.09359768395947,
-    menu: ["Iced Cappuchino", "Matcha Latte", "Espresso"],
-  },  
+    menu: ["Black Coffee", "Decaf Black Coffee", "Black Coffee w/ Cream", "Decaf Black Coffee w/ Cream"],
+  },
   {
     id: "tatte",
     name: "Tatte Bakery & Café",
@@ -67,8 +67,8 @@ export const cafes = [
     mugs: 10,
     lat: 42.34572790,
     lng: -71.10686204,
-    menu: ["Iced Cappuchino", "Pecan Crunch Oatmilk Latte", "Matcha Latte", "Cold Brew"],
-  },  
+    menu: ["Black Coffee", "Decaf Black Coffee", "Black Coffee w/ Cream", "Decaf Black Coffee w/ Cream"],
+  },
   {
     id: "ogawa",
     name: "Caffè Nero",
@@ -78,8 +78,8 @@ export const cafes = [
     mugs: 6,
     lat: 42.35258273330155,
     lng: -71.12267835173266,
-    menu: ["Espresso", "Cortado", "Cold Brew", "Matcha Latte"],
-  }, 
+    menu: ["Black Coffee", "Decaf Black Coffee", "Black Coffee w/ Cream", "Decaf Black Coffee w/ Cream"],
+  },
 ];
 
 export const STATUS_META = {

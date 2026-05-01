@@ -9,7 +9,7 @@ ocr_json = {
       {
         "textAnnotations": [
           {
-            "description": "63"
+            "description": "85"
           }
         ]
       }
@@ -33,7 +33,7 @@ def send_mock_order():
 
 def send_pickup():
     response = requests.post(f'{SERVER_IP_ADDRESS}/pickup', json={
-        "rfid": "1",
+        "rfid": "31 AE 36 F2",
         "ocr": ocr_json
     })
 
@@ -42,13 +42,13 @@ def send_pickup():
 
 def send_return():
     response = requests.post(f'{SERVER_IP_ADDRESS}/return', json={
-        "mug_id": "1"
+        "mug_id": "31 AE 36 F2"
     })
 
     print("Status Code:", response.status_code)
     print("Response Body:", response.json())
 
 #send_mock_order()
-send_pickup()
-#send_return()
+#send_pickup()
+send_return()
 

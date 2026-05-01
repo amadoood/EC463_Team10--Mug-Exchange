@@ -140,7 +140,7 @@ const findOrderFromChit = async (payload) => {
     return await db.getOrderInfo(order_id);
 }
 
-app.post('/pickup2', async (req, res) => {
+app.post('/pickup', async (req, res) => {
     console.log("Pickup endpoint hit: ", req.body);
 
     const pickup_payload = req.body;
@@ -172,13 +172,6 @@ app.post('/pickup2', async (req, res) => {
 
     await db.updateOrderMugID(order.id, pickup_payload.rfid);
 });
-
-app.post('/pickup', async (req, res) => {
-    console.log("Pickup endpoint hit: ", req.body);
-    const pickup_payload = req.body;
-    const rfid = pickup_payload.rfid;
-    return await db.insertMug(rfid);
-})
 
 app.post('/return', async (req, res) => {
     console.log("Return bin endpoint hit: ", req.body);

@@ -14,19 +14,17 @@ export default function OrderView({ visible, onOrder, preSelectedCafe, onClearPr
   const [showCafePicker, setShowCafePicker] = useState(false);
   const [confirmOrder, setConfirmOrder] = useState(null); // { coffee, cafe }
   const [placing, setPlacing] = useState(false);
-  const [result, setResult] = useState(null); // "success" | "error"
-  const [pendingOrderId, setPendingOrderId] = useState(null);
+  const [result, setResult] = useState(null); // "success" | "error" | "no_mugs"
+  const [confirmedOrderNum, setConfirmedOrderNum] = useState(null);
 
   useEffect(() => {
     if (preSelectedCafe) {
       setSelectedCafe(preSelectedCafe);
       onClearPreSelected?.();
 
-      // If also reordering, open confirm modal immediately using preSelectedCafe
-      // directly rather than waiting for selectedCafe state to update
       if (preOrderItem) {
         const coffee = coffees.find(c => c.label === preOrderItem || c.id === preOrderItem);
-        if (coffee) { const oid2 = Math.random().toString(36).substring(2,8).toUpperCase(); setPendingOrderId(oid2); setConfirmOrder({ coffee, cafe: preSelectedCafe }); }
+        if (coffee) setConfirmOrder({ coffee, cafe: preSelectedCafe });
         onClearPreOrderItem?.();
       }
     }
@@ -41,8 +39,14 @@ export default function OrderView({ visible, onOrder, preSelectedCafe, onClearPr
     setPlacing(true);
     try {
       const ok = await onOrder(confirmOrder.coffee, confirmOrder.cafe);
-      if (ok === "no_mugs") setResult("no_mugs");
-      else setResult(ok === false ? "error" : "success");
+      if (ok === "no_mugs") {
+        setResult("no_mugs");
+      } else if (!ok) {
+        setResult("error");
+      } else {
+        setConfirmedOrderNum(ok.order_num ?? null);
+        setResult("success");
+      }
     } catch {
       setResult("error");
     }
@@ -52,6 +56,7 @@ export default function OrderView({ visible, onOrder, preSelectedCafe, onClearPr
   const handleDismissResult = () => {
     setResult(null);
     setConfirmOrder(null);
+    setConfirmedOrderNum(null);
   };
 
   return (
@@ -118,10 +123,6 @@ export default function OrderView({ visible, onOrder, preSelectedCafe, onClearPr
                 <span className="confirm-row-value">{user}</span>
               </div>
               <div className="confirm-row">
-                <span className="confirm-row-label">Order #</span>
-                <span className="confirm-row-value" style={{fontFamily:"monospace",fontSize:"0.78rem",letterSpacing:"0.03em"}}>{pendingOrderId}</span>
-              </div>
-              <div className="confirm-row">
                 <span className="confirm-row-label">Drink</span>
                 <span className="confirm-row-value">{confirmOrder.coffee.label}</span>
               </div>
@@ -170,6 +171,14 @@ export default function OrderView({ visible, onOrder, preSelectedCafe, onClearPr
               <>
                 <div className="result-icon result-success">✓</div>
                 <div className="confirm-title">Order placed!</div>
+                {confirmedOrderNum != null && (
+                  <div className="confirm-rows" style={{ marginBottom: 8 }}>
+                    <div className="confirm-row">
+                      <span className="confirm-row-label">Order #</span>
+                      <span className="confirm-row-value" style={{ fontFamily:"monospace", fontSize:"1rem", fontWeight:700 }}>{confirmedOrderNum}</span>
+                    </div>
+                  </div>
+                )}
                 <p className="confirm-note" style={{ textAlign:"center" }}>
                   Head to <strong>{confirmOrder?.cafe.name}</strong> and show this confirmation to the barista.<br /><br />
                   Your mug will be waiting.
@@ -222,7 +231,7 @@ export default function OrderView({ visible, onOrder, preSelectedCafe, onClearPr
             </div>
             <button
               className="order-btn"
-              onClick={() => { const oid = Math.random().toString(36).substring(2,8).toUpperCase(); setPendingOrderId(oid); setConfirmOrder({ coffee, cafe: selectedCafe }); }}
+              onClick={() => setConfirmOrder({ coffee, cafe: selectedCafe })}
             >
               Order with mug
             </button>

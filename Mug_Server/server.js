@@ -117,7 +117,7 @@ app.post('/internal-order', async (req, res) => {
         io.to("barista").emit("newOrder", { order_num, name: user_name, item: order.item, cafe_name: order.cafe_name || null, order_time: order.time });
     }
 
-    res.status(200).json({ message: "Order received" });
+    res.status(200).json({ message: "Order received", order_num: order_num });
 });
 
 app.get('/barista/active-orders', async (req, res) => {
@@ -140,7 +140,7 @@ const findOrderFromChit = async (payload) => {
     return await db.getOrderInfo(order_id);
 }
 
-app.post('/pickup', async (req, res) => {
+app.post('/pickup2', async (req, res) => {
     console.log("Pickup endpoint hit: ", req.body);
 
     const pickup_payload = req.body;
@@ -172,14 +172,14 @@ app.post('/pickup', async (req, res) => {
 
     await db.updateOrderMugID(order.id, pickup_payload.rfid);
 });
-/*
+
 app.post('/pickup', async (req, res) => {
     console.log("Pickup endpoint hit: ", req.body);
     const pickup_payload = req.body;
     const rfid = pickup_payload.rfid;
     return await db.insertMug(rfid);
 })
-*/
+
 app.post('/return', async (req, res) => {
     console.log("Return bin endpoint hit: ", req.body);
     res.status(200).json({message: "Return RFID received"});
@@ -251,6 +251,7 @@ app.post('/login', async (req, res) => {
     const mappedOrders = (await db.getUserOrders(uid)).map(o => ({
         id:          o.id,
         orderId:     o.id,
+        order_num:   o.order_num,
         item:        o.item,
         status:      o.status,
         mug_id:      o.mug_id,
@@ -275,6 +276,7 @@ app.get('/verify', async (req, res) => {
     const mappedOrders = (await db.getUserOrders(user.user_id)).map(o => ({
         id:          o.id,
         orderId:     o.id,
+        order_num:   o.order_num,
         item:        o.item,
         status:      o.status,
         mug_id:      o.mug_id,

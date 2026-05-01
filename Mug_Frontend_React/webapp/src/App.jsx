@@ -255,8 +255,12 @@ function App() {
         console.error("[order] failed:", await res.text());
         return false;
       }
+      const data = await res.json();
+      const order_num = data.order_num ?? null;
       setOrders(prev => [{
         id: body.id,
+        orderId: body.id,
+        order_num,
         item: coffee.label,
         status: "IN_PROGRESS",
         mug_id: null,
@@ -266,7 +270,7 @@ function App() {
       }, ...prev]);
       setView("dashboard");
       setToastMessage(`Order placed at ${selectedCafe?.name ?? "cafe"}!`);
-      return true;
+      return { order_num };
     } catch (err) {
       console.error("[order] error:", err);
       return false;

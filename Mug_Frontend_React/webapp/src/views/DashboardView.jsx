@@ -121,7 +121,7 @@ export default function DashboardView({ visible, user, displayName, activeOrders
               </div>
               <div className="confirm-row">
                 <span className="confirm-row-label">Order #</span>
-                <span className="confirm-row-value" style={{fontFamily:"monospace",fontSize:"0.9rem",letterSpacing:"0.05em",fontWeight:600}}>{(receiptOrder.id || receiptOrder.orderId || "—").toString().substring(0,6).toUpperCase()}</span>
+                <span className="confirm-row-value" style={{fontFamily:"monospace",fontSize:"0.9rem",letterSpacing:"0.05em",fontWeight:600}}>{receiptOrder.order_num ?? "—"}</span>
               </div>
               <div className="confirm-row">
                 <span className="confirm-row-label">Drink</span>

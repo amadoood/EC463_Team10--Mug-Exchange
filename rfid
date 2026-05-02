@@ -1,0 +1,27 @@
+import time
+from mfrc522 import SimpleMFRC522
+import RPi.GPIO as GPIO
+
+# If you wired RST to a different pin, set pin_rst=<BCM_PIN> here.
+reader = SimpleMFRC522()  # default RST = BCM22 as wired above
+
+print("Hold a tag near the RC522… (Ctrl+C to quit)")
+last_uid = None
+last_time = 0.0
+DEBOUNCE_S = 0.8  # suppress repeats for this many seconds
+
+try:
+    while True:
+        uid, _ = reader.read_no_block()
+        now = time.time()
+        if uid is not None and (uid != last_uid or (now - last_time) > DEBOUNCE_S):
+            print(f"UID: {uid}")
+            last_uid = uid
+            last_time = now
+        time.sleep(0.05)
+except KeyboardInterrupt:
+    pass
+finally:
+    GPIO.cleanup()
+
+
